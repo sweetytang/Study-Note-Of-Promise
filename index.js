@@ -57,40 +57,62 @@ class Promise {
         const promise2 = new Promise((resolve, reject) => { // 此处必须用箭头函数绑定this至调用then的promise对象
             if (this.status === FULLFILLED) {
                 /**
-                 * 如果resolveValue是promise，则下一次调用的onResolve还是onReject，完成了所有的步骤，包括最终状态的第一次改变，后面的状态改变无效。
-                 */
-                const resolveValue = onResolve(this.value);
-                /**
                  * 1. 需用setTimeout到下一循环 方能取得promise2
                  * 2. 箭头函数绑定了this至调用then的promise对象
                  * 3. call使得resolvePromise中的this绑定至调用then的promise对象
                  */
                 setTimeout(() => {
-                    resolvePromise(promise2, resolveValue, resolve, reject);
+                    try {
+                        /**
+                         * 如果resolveValue是promise，则下一次调用的onResolve还是onReject，完成了所有的步骤，包括最终状态的第一次改变，后面的状态改变无效。
+                         */
+                        const resolveValue = onResolve(this.value);
+                        resolvePromise(promise2, resolveValue, resolve, reject);
+                    } catch(err) {
+                        reject(err)
+                    }
                 }, 0);
             }
 
             if (this.status === REJECTED) {
-                /**
-                 * 如果rejectReason是promise，则下一次调用的onResolve还是onReject，完成了所有的步骤，包括最终状态的第一次改变，后面的状态改变无效。
-                 */
-                const rejectReason = onReject(this.reason);
                 setTimeout(() => {
-                    resolvePromise(promise2, rejectReason, resolve, reject);
+                    try {
+                        /**
+                         * 如果rejectReason是promise，则下一次调用的onResolve还是onReject，完成了所有的步骤，包括最终状态的第一次改变，后面的状态改变无效。
+                         */
+                        const rejectReason = onReject(this.reason);
+                        resolvePromise(promise2, rejectReason, resolve, reject);
+                    } catch(err) {
+                        reject(err);
+                    }
                 }, 0);
             }
 
             if (this.status === PENDING) {
                 this.resolveCallback.push(() => {
-                    const resolveValue = onResolve(this.value);
                     setTimeout(() => {
-                        resolvePromise(promise2, resolveValue, resolve, reject);
+                        try {
+                            /**
+                             * 如果resolveValue是promise，则下一次调用的onResolve还是onReject，完成了所有的步骤，包括最终状态的第一次改变，后面的状态改变无效。
+                             */
+                            const resolveValue = onResolve(this.value);
+                            resolvePromise(promise2, resolveValue, resolve, reject);
+                        } catch(err) {
+                            reject(err)
+                        }
                     }, 0);
                 });
                 this.rejectCallback.push(() => {
-                    const rejectReason = onReject(this.reason);
                     setTimeout(() => {
-                        resolvePromise(promise2, rejectReason, resolve, reject);
+                        try {
+                            /**
+                             * 如果rejectReason是promise，则下一次调用的onResolve还是onReject，完成了所有的步骤，包括最终状态的第一次改变，后面的状态改变无效。
+                             */
+                            const rejectReason = onReject(this.reason);
+                            resolvePromise(promise2, rejectReason, resolve, reject);
+                        } catch(err) {
+                            reject(err);
+                        }
                     }, 0);
                 });
             }
