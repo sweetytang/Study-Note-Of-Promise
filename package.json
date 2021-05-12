@@ -1,0 +1,26 @@
+{
+  "name": "study_note_of_promise",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "testPromise": "promises-aplus-tests ./index.js",
+    "dev": "nodemon ./index.js -i "
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sweetytang/Study-Note-Of-Promise.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sweetytang/Study-Note-Of-Promise/issues"
+  },
+  "homepage": "https://github.com/sweetytang/Study-Note-Of-Promise#readme",
+  "devDependencies": {
+    "nodemon": "^2.0.7",
+    "promises-aplus-tests": "^2.1.2"
+  }
+}
