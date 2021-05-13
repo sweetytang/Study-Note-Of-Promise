@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>期约取消</title>
+</head>
+<body>
+    <button id='cancelBtn'>期约取消</button>
+</body>
+<script>
+    const cancelBtn = document.getElementById('cancelBtn');
+    class CancelToken {
+        constructor(cancelCallback) {
+            this.promise = new Promise((resolve, reject) => {
+                cancelCallback(() => {
+                    setTimeout(console.log, 0, 'clearTimeout timerID')
+                    resolve('cancel test');
+                })
+            })
+        }
+    }
+
+    const p = new Promise((resolve, reject) => {
+        const timerID = setTimeout(() => {
+            resolve('cancel test');
+        }, 5000);
+
+        const CancelToken = new CancelToken(innerCb => {
+            cancelBtn.addEventListener('click', innerCb); // 不用CancelToken，直接绑定clearTimeout(timerID)不是更直接吗
+        });
+        CancelToken.promise.then(() => clearTimeout(timerID));
+    });
+
+    p.then((value) => console.log('p: ', value));
+    setTimeout(console.log, 6000, 'p: ', p);
+</script>
+</html>

@@ -1,2 +1,8 @@
+# 尝试下gitignore的用法
+# 主要分为两个方面：
+# 1. 文件夹  符号： / 和 **  例子：**/foo  foo/**
+# 2. 文件 符号： .  例子： *.json
+# 3. 通用符号: *
+
 node_modules/
 !.gitignore

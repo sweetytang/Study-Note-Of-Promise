@@ -5,8 +5,9 @@ const {
     defaultOnResolve,
     defaultOnReject
 } = require('./constant.js');
-const isFunction = require('./helper/isFunction.js');
-const resolvePromise = require('./helper/resolvePromise.js');
+const isFunction = require('../helper/isFunction.js');
+const resolvePromise = require('../helper/resolvePromise.js');
+const isPromise = require('../helper/isPromise');
 
 class Promise {
     constructor(excutor) {
@@ -48,6 +49,64 @@ class Promise {
 
     static reject(reason) {
         return new Promise((resolve, reject) => reject(reason));
+    }
+
+    static all(promiseArray) {        
+        return new Promise((resolve, reject) => {
+            /**
+             * 针对Promise.all()情况
+             */
+            if (!(promiseArray && promiseArray[Symbol.iterator])) {
+                throw new TypeError('cannot read Symbol.iterator of undefined');
+            }
+            /**
+             * 针对Promise.all([])情况
+             */
+            if (!(promiseArray && promiseArray.length)) {
+                return resolve();
+            }
+            const resolveResArr = [];
+            const resolveResult = (index, value) => {
+                resolveResArr[index] = value;
+                if (index === (promiseArray.length  - 1)) {
+                    return resolve(resolveResArr);
+                }
+            }
+            for (let i = 0; i < promiseArray.length ; i++) {
+                const promise = promiseArray[i];
+                if (isPromise(promise)) {
+                    promise.then(value => {
+                        resolveResult(i, value);
+                    }, err => {
+                        return reject(err);
+                    });
+                } else {
+                    resolveResult(i, promise);
+                }
+            }
+        });
+    }
+
+    static race(promiseArray) {
+        return new Promise((resolve, reject) => {
+            /**
+             * 针对Promise.all()情况
+             */
+             if (!(promiseArray && promiseArray[Symbol.iterator])) {
+                throw new TypeError('cannot read Symbol.iterator of undefined');
+            }
+            for (const promise of promiseArray) {
+                if (isPromise(promise)) {
+                    promise.then(value => {
+                        return resolve(value);
+                    }, err => {
+                        return reject(err);
+                    });
+                } else {
+                    return resolve(promise);
+                }
+            }
+        });
     }
 
     then(onResolve, onReject) {
@@ -125,8 +184,21 @@ class Promise {
         onReject = isFunction(onReject) ? onReject : defaultOnReject;
         return this.then(null, onReject);
     }
+
+    finally(cb) {
+        return this.then((value) => {
+            return Promise.resolve(cb()).then(() => value);
+        }, (err) => {
+            return Promise.resolve(cb()).then(() => {
+                throw err;
+            });
+        })
+    }
 }
 
+/**
+ * 官方测试用
+ */
 Promise.defer = Promise.deferred = function() {
     let dfd = {}
     dfd.promise = new Promise((resolve, reject) => {

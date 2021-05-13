@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "testPromise": "promises-aplus-tests ./index.js",
-    "dev": "nodemon ./index.js -i "
+    "testPromise": "promises-aplus-tests ./src/index.js",
+    "dev": "nodemon ./src/index.js -i "
   },
   "repository": {
     "type": "git",
@@ -20,7 +20,11 @@
   },
   "homepage": "https://github.com/sweetytang/Study-Note-Of-Promise#readme",
   "devDependencies": {
+    "babel-eslint": "^10.1.0",
     "nodemon": "^2.0.7",
     "promises-aplus-tests": "^2.1.2"
+  },
+  "dependencies": {
+    "eslint": "^7.26.0"
   }
 }

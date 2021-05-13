@@ -1,0 +1,5 @@
+# 尝试下eslintignore 语法同gitignore
+
+node_modules/
+*.md
+*.json

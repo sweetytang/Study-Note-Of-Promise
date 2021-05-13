@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>期约进度通知</title>
+</head>
+<body>
+    
+</body>
+<script>
+    class TrackPromise extends Promise {
+        constructor(excutor) {
+            const notifyHandlers = [];
+            const notify = status => {
+                notifyHandlers.forEach(handler => handler(status));
+            }
+            super((resolve, reject) => {
+                return excutor(resolve, reject, notify);
+            });
+            this.notifyHandlers = notifyHandlers; // 引用，两者指向同一个数组
+        }
+
+        addNotify(cb) {
+            if (typeof cb === 'function') {
+                this.notifyHandlers.push(cb);
+             }
+            return this; // 可以连锁
+        }
+    }
+
+    let p = new TrackPromise((resolve, reject, notify) => {
+        function countdown(x) {
+            if (x > 0) {
+                setTimeout(() => notify(`${20 * x}% remaining`), 0); // 延后，才能打印100%
+                setTimeout(() => countdown(x - 1), 1000);
+            } else {
+                resolve();
+            }
+        }
+        countdown(5);
+    });
+
+    p.addNotify((x) => setTimeout(console.log, 0, 'a:', x))
+     .addNotify((x) => setTimeout(console.log, 0, 'b:', x));
+
+    p.then(() => setTimeout(console.log, 0, 'completed'));
+</script>
+</html>
